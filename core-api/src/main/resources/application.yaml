@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: core-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/energysense
+    username: energysense
+    password: energysense
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+mqtt:
+  broker-url: tcp://localhost:1883
+  client-id: core-api-client
+  topic-filter: sites/+/sensors/+/reading
+
+jwt:
+  secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET_BEFORE_ANY_REAL_DEPLOYMENT
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
