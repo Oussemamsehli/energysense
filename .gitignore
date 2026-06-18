@@ -1,0 +1,27 @@
+# Build output
+target/
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Future frontend (Angular/Node)
+node_modules/
+dist/
+
+# Future simulator (Python)
+__pycache__/
+*.pyc
+.venv/
+
+# Secrets / config locale
+application-local.yml
