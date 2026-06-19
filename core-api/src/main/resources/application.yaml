@@ -22,8 +22,7 @@ spring:
 mqtt:
   broker-url: tcp://localhost:1883
   client-id: core-api-client
-  topic-filter: sites/+/sensors/+/reading
-
+  topic-filter: energysense/#
 jwt:
   secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET_BEFORE_ANY_REAL_DEPLOYMENT
   expiration-ms: 3600000
