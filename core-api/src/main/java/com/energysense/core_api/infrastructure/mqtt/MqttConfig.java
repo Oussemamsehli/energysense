@@ -4,13 +4,15 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.SubscribableChannel;
 
 @Configuration
 public class MqttConfig {
@@ -36,21 +38,30 @@ public class MqttConfig {
     }
 
     @Bean
-    public IntegrationFlow mqttFlow(MqttPahoClientFactory mqttClientFactory,
-                                    MqttReadingAdapter mqttReadingAdapter) {
+    public MessageChannel mqttInputChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MqttPahoMessageDrivenChannelAdapter mqttAdapter(
+            MqttPahoClientFactory mqttClientFactory) {
         MqttPahoMessageDrivenChannelAdapter adapter =
                 new MqttPahoMessageDrivenChannelAdapter(clientId, mqttClientFactory, topicFilter);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
+        adapter.setOutputChannel(mqttInputChannel());
+        return adapter;
+    }
 
-        return IntegrationFlow
-                .from(adapter)
-                .handle((Message<?> message) -> {
-                    String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-                    String payload = (String) message.getPayload();
-                    mqttReadingAdapter.handle(topic, payload);
-                })
-                .get();
+    @Bean
+    public MessageHandler mqttMessageHandler(MqttReadingAdapter mqttReadingAdapter) {
+        MessageHandler handler = message -> {
+            String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
+            String payload = (String) message.getPayload();
+            mqttReadingAdapter.handle(topic, payload);
+        };
+        ((SubscribableChannel) mqttInputChannel()).subscribe(handler);
+        return handler;
     }
 }
