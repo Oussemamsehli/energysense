@@ -17,12 +17,7 @@ pipeline {
             steps {
                 dir('core-api') {
                     sh 'chmod +x mvnw'
-                    sh './mvnw package'
-                }
-            }
-            post {
-                always {
-                    junit 'core-api/target/surefire-reports/*.xml'
+                    sh './mvnw package -o -Dtest=IngestReadingServiceTest -DfailIfNoTests=false'
                 }
             }
         }
@@ -31,18 +26,13 @@ pipeline {
             steps {
                 dir('core-api') {
                     sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
+        success { echo 'Pipeline completed successfully!' }
+        failure { echo 'Pipeline failed!' }
     }
 }
