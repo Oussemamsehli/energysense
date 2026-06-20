@@ -17,7 +17,7 @@ pipeline {
             steps {
                 dir('core-api') {
                     sh 'chmod +x mvnw'
-                    sh './mvnw package -o -Dtest=IngestReadingServiceTest -DfailIfNoTests=false'
+                    sh './mvnw package -o -Dtest=IngestReadingServiceTest -DfailIfNoTests=false -Dmaven.repo.local=/var/jenkins_home/.m2/repository'
                 }
             }
         }
