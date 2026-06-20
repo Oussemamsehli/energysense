@@ -10,6 +10,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=true
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - energysense-ci
 
@@ -23,6 +26,9 @@ services:
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - energysense-ci
 
