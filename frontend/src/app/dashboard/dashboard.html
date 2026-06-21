@@ -1,0 +1,33 @@
+<div class="dashboard">
+  <h1>EnergySense Dashboard</h1>
+
+  <div class="stats">
+    <div class="card">
+      <h2>{{ sites.length }}</h2>
+      <p>Sites</p>
+    </div>
+    <div class="card alert">
+      <h2>{{ alerts.length }}</h2>
+      <p>Alertes actives</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Sites</h3>
+    <div *ngIf="loading">Chargement...</div>
+    <table *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Localisation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let site of sites">
+          <td>{{ site.name }}</td>
+          <td>{{ site.location }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
