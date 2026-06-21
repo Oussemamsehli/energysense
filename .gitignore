@@ -24,4 +24,4 @@ __pycache__/
 .venv/
 
 # Secrets / config locale
-application-local.yml
+application-local.ymlminikube-linux-amd64
