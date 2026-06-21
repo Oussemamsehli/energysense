@@ -25,7 +25,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 dir('core-api') {
-                    sh "docker build --no-cache -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 }
             }
         }
