@@ -1,18 +1,15 @@
 pipeline {
     agent any
-
     environment {
         DOCKER_IMAGE = "oussemamsehli/energysense-core-api"
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
-
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
         stage('Build & Test') {
             steps {
                 dir('core-api') {
@@ -21,7 +18,6 @@ pipeline {
                 }
             }
         }
-
         stage('Docker Build') {
             steps {
                 dir('core-api') {
@@ -29,7 +25,6 @@ pipeline {
                 }
             }
         }
-
         stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(
@@ -43,8 +38,25 @@ pipeline {
                 }
             }
         }
+        stage('Update Manifest') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        git config user.email "jenkins@energysense.local"
+                        git config user.name "Jenkins"
+                        sed -i 's|${DOCKER_IMAGE}:.*|${DOCKER_IMAGE}:${DOCKER_TAG}|g' k8s/deployment.yaml
+                        git add k8s/deployment.yaml
+                        git commit -m "ci(k8s): update image to version ${DOCKER_TAG}" || echo "No changes to commit"
+                        git push file:///var/jenkins_home/energysense-repo feature/k8s-manifests
+                    """
+                }
+            }
+        }
     }
-
     post {
         success { echo 'Pipeline completed successfully!' }
         failure { echo 'Pipeline failed!' }
