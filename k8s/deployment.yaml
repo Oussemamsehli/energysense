@@ -23,3 +23,9 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres:5432/energysense"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "energysense"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "energysense"
