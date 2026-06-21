@@ -51,7 +51,7 @@ pipeline {
                         sed -i 's|${DOCKER_IMAGE}:.*|${DOCKER_IMAGE}:${DOCKER_TAG}|g' k8s/deployment.yaml
                         git add k8s/deployment.yaml
                         git commit -m "ci(k8s): update image to version ${DOCKER_TAG}" || echo "No changes to commit"
-                        git push file:///var/jenkins_home/energysense-repo HEAD:feature/k8s-manifests
+                        git push file:///var/jenkins_home/energysense-repo HEAD:feature/k8s-manifests --force
                     """
                 }
             }
