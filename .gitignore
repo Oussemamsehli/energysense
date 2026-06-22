@@ -25,3 +25,9 @@ __pycache__/
 
 # Secrets / config locale
 application-local.yml
+# build artifacts
+target/
+frontend/.angular/
+frontend/node_modules/
+frontend/dist/
+minikube-linux-amd64
