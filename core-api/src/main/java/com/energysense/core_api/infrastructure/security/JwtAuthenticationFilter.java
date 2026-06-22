@@ -33,8 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         String token = authHeader.substring(7);
+        System.err.println("JWT_DEBUG token=" + token.substring(0,20));
         log.warning("JWT token received, length: " + token.length());
         if (!jwtService.isTokenValid(token)) {
+            System.err.println("JWT_DEBUG INVALID");
             log.warning("JWT token INVALID - rejected");
             filterChain.doFilter(request, response);
             return;
@@ -42,7 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = jwtService.extractEmail(token);
         log.warning("JWT valid, email: " + email);
         User user = userRepository.findByEmail(email).orElse(null);
+        System.err.println("JWT_DEBUG email=" + email);
         if (user == null) {
+            System.err.println("JWT_DEBUG USER_NULL");
             log.warning("User not found in DB: " + email);
             filterChain.doFilter(request, response);
             return;
