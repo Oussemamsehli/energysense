@@ -39,14 +39,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+        System.err.println("JWT_DEBUG token=" + token.substring(0,20));
         if (!jwtService.isTokenValid(token)) {
+            System.err.println("JWT_DEBUG INVALID");
             filterChain.doFilter(request, response);
             return;
         }
 
         String email = jwtService.extractEmail(token);
         User user = userRepository.findByEmail(email).orElse(null);
+        System.err.println("JWT_DEBUG email=" + email);
         if (user == null) {
+            System.err.println("JWT_DEBUG USER_NULL");
             filterChain.doFilter(request, response);
             return;
         }
