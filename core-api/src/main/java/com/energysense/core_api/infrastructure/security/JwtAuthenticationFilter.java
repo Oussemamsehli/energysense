@@ -47,7 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = jwtService.extractEmail(token);
-        User user = userRepository.findByEmail(email).orElse(null);
+        User user = null;
+        try { user = userRepository.findByEmail(email).orElse(null); } catch(Exception e) { System.err.println("JWT_DEBUG DB_ERROR " + e.getMessage()); }
         System.err.println("JWT_DEBUG email=" + email);
         if (user == null) {
             System.err.println("JWT_DEBUG USER_NULL");
