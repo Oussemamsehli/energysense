@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: energysense-core-api
-          image: oussemamsehli/energysense-core-api:42
+          image: oussemamsehli/energysense-core-api:43
           ports:
             - containerPort: 8080
           env:
