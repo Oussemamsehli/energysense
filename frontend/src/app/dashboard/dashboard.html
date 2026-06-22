@@ -1,33 +1,38 @@
 <div class="dashboard">
-  <h1>EnergySense Dashboard</h1>
-
-  <div class="stats">
-    <div class="card">
-      <h2>{{ sites.length }}</h2>
-      <p>Sites</p>
-    </div>
-    <div class="card alert">
-      <h2>{{ alerts.length }}</h2>
-      <p>Alertes actives</p>
-    </div>
+  <div *ngIf="!loggedIn" class="login-form">
+    <h2>Connexion</h2>
+    <input type="email" [(ngModel)]="email" placeholder="Email" /><br/>
+    <input type="password" [(ngModel)]="password" placeholder="Mot de passe" /><br/>
+    <button (click)="login()">Se connecter</button>
+    <p *ngIf="error" style="color:red">{{ error }}</p>
   </div>
 
-  <div class="section">
-    <h3>Sites</h3>
-    <div *ngIf="loading">Chargement...</div>
-    <table *ngIf="!loading">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Localisation</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let site of sites">
-          <td>{{ site.name }}</td>
-          <td>{{ site.location }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div *ngIf="loggedIn">
+    <h1>EnergySense Dashboard</h1>
+    <button (click)="loadData()">🔄 Rafraîchir</button>
+    <div class="stats">
+      <div class="card">
+        <h2>{{ sites.length }}</h2>
+        <p>Sites</p>
+      </div>
+      <div class="card alert">
+        <h2>{{ alerts.length }}</h2>
+        <p>Alertes actives</p>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Sites</h3>
+      <div *ngIf="loading">Chargement...</div>
+      <table *ngIf="!loading && sites.length > 0">
+        <thead><tr><th>Nom</th><th>Localisation</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let site of sites">
+            <td>{{ site.name }}</td>
+            <td>{{ site.location }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loading && sites.length === 0">Aucun site trouvé.</p>
+    </div>
   </div>
 </div>
