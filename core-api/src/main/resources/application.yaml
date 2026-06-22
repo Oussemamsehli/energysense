@@ -6,7 +6,7 @@ spring:
     name: core-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/energysense
+    url: jdbc:postgresql://postgres:5432/energysense
     username: energysense
     password: energysense
     driver-class-name: org.postgresql.Driver
