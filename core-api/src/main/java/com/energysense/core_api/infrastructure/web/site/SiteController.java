@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sites")
+@RequestMapping("/api/sites")
 public class SiteController {
 
     private final CreateSiteUseCase createSiteUseCase;

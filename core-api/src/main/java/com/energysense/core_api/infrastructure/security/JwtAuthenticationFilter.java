@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,6 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepositoryPort userRepository;
+    private final SecurityContextRepository securityContextRepository =
+            new HttpSessionSecurityContextRepository();
 
     public JwtAuthenticationFilter(JwtService jwtService, UserRepositoryPort userRepository) {
         this.jwtService = jwtService;
@@ -45,19 +50,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        System.err.println("JWT_DEBUG token=" + token.substring(0,20));
         if (!jwtService.isTokenValid(token)) {
-            System.err.println("JWT_DEBUG INVALID");
             filterChain.doFilter(request, response);
             return;
         }
 
         String email = jwtService.extractEmail(token);
         User user = null;
-        try { user = userRepository.findByEmail(email).orElse(null); } catch(Exception e) { System.err.println("JWT_DEBUG DB_ERROR " + e.getMessage()); }
-        System.err.println("JWT_DEBUG email=" + email + " user=" + (user != null ? user.getRole() : "NULL"));
+        try {
+            user = userRepository.findByEmail(email).orElse(null);
+        } catch (Exception e) {
+            System.err.println("JWT_DEBUG DB_ERROR " + e.getMessage());
+        }
+
         if (user == null) {
-            System.err.println("JWT_DEBUG USER_NULL");
             filterChain.doFilter(request, response);
             return;
         }
@@ -67,7 +73,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         user.getEmail(), null,
                         List.of(new SimpleGrantedAuthority(user.getRole()))
                 );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
+        System.err.println("JWT_DEBUG SUCCESS user=" + email);
         filterChain.doFilter(request, response);
     }
 }

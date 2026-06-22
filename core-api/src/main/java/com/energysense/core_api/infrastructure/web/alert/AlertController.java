@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sensors/{sensorId}/alerts")
+@RequestMapping("/api/sensors/{sensorId}/alerts")
 public class AlertController {
 
     private final GetAlertsUseCase getAlertsUseCase;
