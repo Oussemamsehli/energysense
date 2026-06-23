@@ -1,38 +1,136 @@
-<div class="dashboard">
-  <div *ngIf="!loggedIn" class="login-form">
-    <h2>Connexion</h2>
-    <input type="email" [(ngModel)]="email" placeholder="Email" /><br/>
-    <input type="password" [(ngModel)]="password" placeholder="Mot de passe" /><br/>
-    <button (click)="login()">Se connecter</button>
-    <p *ngIf="error" style="color:red">{{ error }}</p>
-  </div>
+<div class="app-dark">
+  <aside class="sidebar-dark">
+    <div class="logo-dark">
+      <span class="logo-icon">⚡</span>
+      <span>EnergySense</span>
+    </div>
+    <nav class="nav-dark">
+      <a routerLink="/dashboard" routerLinkActive="nav-active" class="nav-link">
+        <span class="nav-icon">▦</span> Dashboard
+      </a>
+      <a routerLink="/sites" routerLinkActive="nav-active" class="nav-link">
+        <span class="nav-icon">◈</span> Sites
+      </a>
+      <a routerLink="/alerts" routerLinkActive="nav-active" class="nav-link">
+        <span class="nav-icon">◉</span> Alertes
+        <span class="nav-badge" *ngIf="alerts.length > 0">{{ alerts.length }}</span>
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="btn-logout-dark" (click)="logout()">Déconnexion</button>
+    </div>
+  </aside>
 
-  <div *ngIf="loggedIn">
-    <h1>EnergySense Dashboard</h1>
-    <button (click)="loadData()">🔄 Rafraîchir</button>
-    <div class="stats">
-      <div class="card">
-        <h2>{{ sites.length }}</h2>
-        <p>Sites</p>
+  <main class="main-dark">
+    <div class="topbar-dark">
+      <div class="topbar-left">
+        <h1>Overview</h1>
+        <div class="breadcrumb">Dashboards / EnergySense</div>
       </div>
-      <div class="card alert">
-        <h2>{{ alerts.length }}</h2>
-        <p>Alertes actives</p>
+      <div class="topbar-right">
+        <div class="time-display">{{ currentTime }}</div>
+        <div class="live-indicator"><span class="live-dot">●</span> Live</div>
+        <button class="btn-dark" (click)="loadData()">↺ Refresh</button>
       </div>
     </div>
-    <div class="section">
-      <h3>Sites</h3>
-      <div *ngIf="loading">Chargement...</div>
-      <table *ngIf="!loading && sites.length > 0">
-        <thead><tr><th>Nom</th><th>Localisation</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let site of sites">
-            <td>{{ site.name }}</td>
-            <td>{{ site.location }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!loading && sites.length === 0">Aucun site trouvé.</p>
+
+    <div class="metrics-row">
+      <div class="metric-dark">
+        <div class="metric-icon green">◈</div>
+        <div class="metric-data">
+          <div class="metric-val">{{ sites.length }}</div>
+          <div class="metric-lbl">Sites actifs</div>
+        </div>
+        <div class="metric-trend green">↑ +1</div>
+      </div>
+      <div class="metric-dark">
+        <div class="metric-icon blue">⬡</div>
+        <div class="metric-data">
+          <div class="metric-val">{{ sites.length * 3 }}</div>
+          <div class="metric-lbl">Capteurs</div>
+        </div>
+        <div class="metric-trend blue">Online</div>
+      </div>
+      <div class="metric-dark">
+        <div class="metric-icon yellow">⚡</div>
+        <div class="metric-data">
+          <div class="metric-val">284 <span class="metric-unit">kWh</span></div>
+          <div class="metric-lbl">Conso. aujourd'hui</div>
+        </div>
+        <div class="metric-trend green">↓ -8%</div>
+      </div>
+      <div class="metric-dark" [class.metric-alert]="alerts.length > 0">
+        <div class="metric-icon" [class.red]="alerts.length > 0" [class.green]="alerts.length === 0">◉</div>
+        <div class="metric-data">
+          <div class="metric-val" [class.text-red]="alerts.length > 0">{{ alerts.length }}</div>
+          <div class="metric-lbl">Alertes actives</div>
+        </div>
+        <div class="metric-trend" [class.red]="alerts.length > 0" [class.green]="alerts.length === 0">
+          {{ alerts.length === 0 ? '✓ OK' : '⚠ Critique' }}
+        </div>
+      </div>
     </div>
-  </div>
+
+    <div class="panels-row">
+      <div class="panel-dark panel-lg">
+        <div class="panel-header">
+          <span class="panel-title">Consommation énergétique — 24h</span>
+          <span class="panel-badge">kWh</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas #consumptionChart></canvas>
+        </div>
+      </div>
+
+      <div class="panel-dark panel-sm">
+        <div class="panel-header">
+          <span class="panel-title">Charge par site</span>
+        </div>
+        <div class="gauge-list">
+          <div class="gauge-item" *ngFor="let site of sites; let i = index">
+            <div class="gauge-label">{{ site.name }}</div>
+            <div class="gauge-bar-dark">
+              <div class="gauge-fill-dark" [style.width.%]="[82,67,91,34][i % 4]"
+                   [class.gauge-warn]="[82,67,91,34][i % 4] > 85"></div>
+            </div>
+            <div class="gauge-val">{{ [82,67,91,34][i % 4] }}%</div>
+          </div>
+          <div class="empty-gauge" *ngIf="sites.length === 0">Aucun site</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-dark">
+      <div class="panel-header">
+        <span class="panel-title">Sites — État du parc</span>
+        <a routerLink="/sites" class="panel-link">Voir tout →</a>
+      </div>
+      <div class="dark-table">
+        <div class="dark-table-head">
+          <span>Nom</span><span>Localisation</span><span>Capteurs</span><span>CPU%</span><span>Mémoire</span><span>Statut</span>
+        </div>
+        <div class="dark-table-row" *ngFor="let site of sites; let i = index">
+          <span class="site-name-dark">{{ site.name }}</span>
+          <span class="text-muted">{{ site.location }}</span>
+          <span>{{ (i+1) * 3 }}</span>
+          <span>
+            <div class="inline-bar"><div class="inline-fill" [style.width.%]="[45,62,88,23][i%4]"
+              [class.bar-warn]="[45,62,88,23][i%4] > 80"></div></div>
+            {{ [45,62,88,23][i%4] }}%
+          </span>
+          <span>{{ [370,512,256,128][i%4] }} MiB</span>
+          <span><span class="status-dark ok">● En ligne</span></span>
+        </div>
+        <div class="empty-dark" *ngIf="sites.length === 0 && !loading">Aucun site enregistré</div>
+        <div class="empty-dark" *ngIf="loading">Chargement...</div>
+      </div>
+    </div>
+  </main>
 </div>

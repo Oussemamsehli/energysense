@@ -1,1 +1,42 @@
-<p>alerts works!</p>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>⚡</span><span>EnergySense</span></div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
+      <a routerLink="/sites" routerLinkActive="active" class="nav-item">Sites</a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item">Alertes</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Alertes</h1>
+        <p class="topbar-sub">{{ alerts.length }} alerte(s) active(s)</p>
+      </div>
+      <button class="btn-refresh" (click)="loadAlerts()">↺ Rafraîchir</button>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">Chargement...</div>
+
+    <div class="alerts-list" *ngIf="!loading && alerts.length > 0">
+      <div class="alert-card" *ngFor="let alert of alerts">
+        <div class="alert-severity critical">CRITIQUE</div>
+        <div class="alert-body">
+          <div class="alert-title">{{ alert.message || 'Alerte système' }}</div>
+          <div class="alert-meta">Capteur : {{ alert.sensorId || '—' }}</div>
+        </div>
+        <div class="alert-time">Il y a quelques instants</div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && alerts.length === 0">
+      <div class="empty-icon">✓</div>
+      <p>Aucune alerte active</p>
+      <span>Tous les systèmes fonctionnent normalement</span>
+    </div>
+  </main>
+</div>
