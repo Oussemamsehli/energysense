@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: energysense-core-api
+  namespace: default
+  labels:
+    app: energysense-core-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: energysense-core-api
+  template:
+    metadata:
+      labels:
+        app: energysense-core-api
+    spec:
+      containers:
+        - name: energysense-core-api
+          image: oussemamsehli/energysense-core-api:24
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres:5432/energysense"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "energysense"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "energysense"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration"

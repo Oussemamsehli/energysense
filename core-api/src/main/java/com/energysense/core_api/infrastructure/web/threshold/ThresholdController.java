@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sensors/{sensorId}/threshold")
+@RequestMapping("/api/sensors/{sensorId}/threshold")
 public class ThresholdController {
 
     private final SetThresholdUseCase setThresholdUseCase;

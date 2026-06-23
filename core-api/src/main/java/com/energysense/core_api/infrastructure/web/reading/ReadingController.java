@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sensors/{sensorId}/readings")
+@RequestMapping("/api/sensors/{sensorId}/readings")
 public class ReadingController {
 
     private final GetReadingsUseCase getReadingsUseCase;

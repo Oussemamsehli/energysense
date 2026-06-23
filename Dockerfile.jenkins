@@ -1,0 +1,14 @@
+FROM jenkins/jenkins:lts-jdk21
+
+USER root
+
+# Installer Docker CLI
+RUN apt-get update -qq && \
+    apt-get install -y docker.io && \
+    rm -rf /var/lib/apt/lists/*
+
+# Aligner le GID du groupe docker avec celui de l'hôte (986)
+RUN groupmod -g 986 docker && \
+    usermod -aG docker jenkins
+
+USER jenkins

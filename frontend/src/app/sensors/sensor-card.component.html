@@ -1,0 +1,63 @@
+<article class="card" [class.alert]="over()" [attr.data-type]="sensor.type">
+
+  <!-- Top : identité + badge LIVE -->
+  <div class="top">
+    <div class="ident">
+      <span class="ico" [attr.data-t]="sensor.type">
+        @switch (sensor.type) {
+          @case ('temp') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z"/>
+            </svg>
+          }
+          @case ('humidity') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.7S5 10 5 14a7 7 0 0 0 14 0c0-4-7-11.3-7-11.3z"/>
+            </svg>
+          }
+          @case ('power') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+              <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+          }
+          @case ('pressure') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="9"/><path d="M12 12 8 8"/>
+            </svg>
+          }
+        }
+      </span>
+      <div>
+        <div class="name">{{ sensor.name }}</div>
+        <div class="type">{{ label() }}</div>
+      </div>
+    </div>
+    <span class="live"><span class="pip"></span>LIVE</span>
+  </div>
+
+  <!-- Valeur principale + tendance -->
+  <div class="reading">
+    <span class="value">{{ display() }}</span>
+    <span class="unit">{{ sensor.unit }}</span>
+    <span class="trend"
+          [class.up]="trend() > 0"
+          [class.down]="trend() < 0"
+          [class.flat]="trend() === 0">
+      @if (trend() > 0) { ▲ } @else if (trend() < 0) { ▼ } @else { — }
+      {{ absTrend() }}
+    </span>
+  </div>
+
+  <!-- Graphique temps réel -->
+  <div class="chart"><canvas #cv></canvas></div>
+
+  <!-- Pied : statut + seuil -->
+  <div class="foot">
+    <span class="status" [class.ok]="!over()" [class.bad]="over()">
+      <span class="sdot"></span>
+      {{ over() ? 'Seuil dépassé' : 'Nominal' }}
+    </span>
+    <span class="thr">seuil {{ sensor.threshold }}{{ sensor.unit }}</span>
+  </div>
+
+</article>

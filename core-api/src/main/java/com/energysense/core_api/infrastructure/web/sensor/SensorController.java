@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sites/{siteId}/sensors")
+@RequestMapping("/api/sites/{siteId}/sensors")
 public class SensorController {
 
     private final CreateSensorUseCase createSensorUseCase;
