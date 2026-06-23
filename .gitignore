@@ -24,5 +24,13 @@ __pycache__/
 .venv/
 
 # Secrets / config locale
-application-local.ymlminikube-linux-amd64
+application-local.yml
+
+# build artifacts
+target/
+frontend/.angular/
+frontend/node_modules/
+frontend/dist/
+
+# Minikube binary
 minikube-linux-amd64

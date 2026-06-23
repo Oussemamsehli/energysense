@@ -1,5 +1,4 @@
 package com.energysense.core_api.infrastructure.security;
-
 import com.energysense.core_api.application.port.out.UserRepositoryPort;
 import com.energysense.core_api.domain.model.User;
 import jakarta.servlet.FilterChain;
@@ -14,13 +13,12 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.List;
-
+import java.util.logging.Logger;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
+    private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class.getName());
     private final JwtService jwtService;
     private final UserRepositoryPort userRepository;
     private final SecurityContextRepository securityContextRepository =
@@ -30,7 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
@@ -42,43 +39,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-
         String token = authHeader.substring(7);
+        log.warning("JWT token received, length: " + token.length());
         if (!jwtService.isTokenValid(token)) {
+            log.warning("JWT token INVALID - rejected");
             filterChain.doFilter(request, response);
             return;
         }
-
         String email = jwtService.extractEmail(token);
+        log.warning("JWT valid, email: " + email);
         User user = null;
         try {
             user = userRepository.findByEmail(email).orElse(null);
         } catch (Exception e) {
             System.err.println("JWT_DEBUG DB_ERROR " + e.getMessage());
         }
-
         if (user == null) {
+            log.warning("User not found in DB: " + email);
             filterChain.doFilter(request, response);
             return;
         }
-
+        log.warning("User found: " + email + " role: " + user.getRole());
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(), null,
                         List.of(new SimpleGrantedAuthority(user.getRole()))
                 );
-
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, request, response);
-        System.err.println("JWT_DEBUG SUCCESS user=" + email);
         filterChain.doFilter(request, response);
     }
 }

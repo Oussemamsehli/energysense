@@ -38,7 +38,8 @@ public class JwtService {
             extractClaims(token);
             return true;
         } catch (Exception e) {
-            System.err.println("JWT_DEBUG validation failed: " + e.getClass().getName() + ": " + e.getMessage());
+            System.err.println("JWT validation failed: " + e.getClass().getName() + ": " + e.getMessage());
+            System.err.println("JWT validation failed: " + e.getClass().getName() + ": " + e.getMessage());
             return false;
         }
     }
