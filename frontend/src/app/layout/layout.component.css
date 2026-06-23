@@ -1,0 +1,31 @@
+:host { display: block; }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #111217;
+}
+
+/* La sidebar est fixe en hauteur, seul le contenu défile.
+   C'est ce qui donne la sensation "app" plutôt que "page web". */
+.content {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar discrète, dans le ton du thème */
+.content::-webkit-scrollbar { width: 10px; }
+.content::-webkit-scrollbar-track { background: #111217; }
+.content::-webkit-scrollbar-thumb {
+  background: #2a2d35;
+  border-radius: 5px;
+  border: 2px solid #111217;
+}
+.content::-webkit-scrollbar-thumb:hover { background: #3a3e47; }
+
+@media (max-width: 820px) {
+  .layout { flex-direction: column; }
+  .content { height: auto; }
+}
