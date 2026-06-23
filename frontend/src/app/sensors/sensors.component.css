@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════════════════
+   sensors.component.css — EnergySense · Dark premium
+   ═══════════════════════════════════════════════════════ */
+
+:host {
+  --bg:     #111217;
+  --panel:  #181b1f;
+  --border: #2a2d35;
+  --border2:#363b44;
+  --text:   #f0f1f3;
+  --text2:  #969ba3;
+  --text3:  #6e7681;
+  --accent: #1D9E75;
+  --accent2:#2fbf8d;
+  --crit:   #e2504a;
+  --mono:   'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  display: block;
+  color: var(--text);
+  background: var(--bg);           /* ← fond sombre sur le composant */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.page {
+  padding: 24px 30px 48px;
+  background: var(--bg);           /* ← idem sur .page */
+  min-height: 100vh;
+}
+
+/* ── En-tête ───────────────────────────────────────────── */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -.3px;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--crit);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(226,80,74,.10);
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: .05em;
+  border: 1px solid rgba(226,80,74,.20);
+  font-family: var(--mono);
+}
+
+.pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--crit);
+  animation: blink 1.4s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
+}
+
+.sub {
+  font-size: 12.5px;
+  color: var(--text3);
+  margin: 5px 0 0;
+  font-family: var(--mono);
+}
+
+/* ── Bouton rafraîchir ─────────────────────────────────── */
+.btn-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 13px;
+  transition: all .15s;
+}
+.btn-refresh svg { width: 15px; height: 15px; }
+.btn-refresh:hover { color: var(--text); border-color: var(--border2); }
+.btn-refresh.spin svg { animation: rot .7s ease; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* ── Filtres ───────────────────────────────────────────── */
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.pill {
+  padding: 7px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 12.5px;
+  font-family: var(--mono);
+  transition: all .15s;
+}
+.pill:hover { color: var(--text); border-color: var(--border2); }
+.pill.on {
+  background: rgba(29,158,117,.10);
+  border-color: rgba(29,158,117,.30);
+  color: var(--accent2);
+  font-weight: 500;
+}
+
+/* ── Grille capteurs ───────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .page { padding: 16px 14px 40px; }
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip { animation: none; }
+  .btn-refresh.spin svg { animation: none; }
+}
+/* src/app/layout/layout.component.css */
+
+:host { display: block; }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #111217;
+  width: 100%;          /* ← s'assure que le layout prend toute la largeur */
+}
+
+.content {
+  flex: 1;
+  min-width: 0;         /* ← empêche le flex child de déborder */
+  width: 0;             /* ← AJOUT : force le recalcul de largeur dans le contexte flex */
+  height: 100vh;
+  overflow-y: auto;
+  background: #111217;  /* ← fond sombre aussi sur la zone content */
+}
+
+/* Scrollbar discrète */
+.content::-webkit-scrollbar { width: 8px; }
+.content::-webkit-scrollbar-track { background: #111217; }
+.content::-webkit-scrollbar-thumb {
+  background: #2a2d35;
+  border-radius: 4px;
+  border: 2px solid #111217;
+}
+.content::-webkit-scrollbar-thumb:hover { background: #3a3e47; }
+
+@media (max-width: 820px) {
+  .layout { flex-direction: column; }
+  .content { height: auto; width: 100%; }
+}

@@ -1,136 +1,172 @@
-<div class="app-dark">
-  <aside class="sidebar-dark">
-    <div class="logo-dark">
-      <span class="logo-icon">⚡</span>
-      <span>EnergySense</span>
-    </div>
-    <nav class="nav-dark">
-      <a routerLink="/dashboard" routerLinkActive="nav-active" class="nav-link">
-        <span class="nav-icon">▦</span> Dashboard
-      </a>
-      <a routerLink="/sites" routerLinkActive="nav-active" class="nav-link">
-        <span class="nav-icon">◈</span> Sites
-      </a>
-      <a routerLink="/alerts" routerLinkActive="nav-active" class="nav-link">
-        <span class="nav-icon">◉</span> Alertes
-        <span class="nav-badge" *ngIf="alerts.length > 0">{{ alerts.length }}</span>
-      </a>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="user-info">
-        <div class="user-avatar">A</div>
-        <div>
-          <div class="user-name">Admin</div>
-          <div class="user-role">Administrator</div>
-        </div>
-      </div>
-      <button class="btn-logout-dark" (click)="logout()">Déconnexion</button>
-    </div>
-  </aside>
+<div class="page">
 
-  <main class="main-dark">
-    <div class="topbar-dark">
-      <div class="topbar-left">
-        <h1>Overview</h1>
-        <div class="breadcrumb">Dashboards / EnergySense</div>
+  <!-- ── Topbar ─────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div>
+      <h1 class="title">Overview</h1>
+      <p class="sub">Dashboards / EnergySense · {{ currentTime }}</p>
+    </div>
+    <div class="topbar-right">
+      <span class="live-tag"><span class="pip"></span>Live</span>
+      <button class="btn-refresh" (click)="loadData()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/>
+          <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Stats row ──────────────────────────────────────────── -->
+  <div class="stats-row">
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M3 21h18M6 21V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v16M18 21V11l-4-2"/>
+        </svg>
       </div>
-      <div class="topbar-right">
-        <div class="time-display">{{ currentTime }}</div>
-        <div class="live-indicator"><span class="live-dot">●</span> Live</div>
-        <button class="btn-dark" (click)="loadData()">↺ Refresh</button>
+      <div class="stat-data">
+        <div class="stat-val">{{ sitesData().total }}</div>
+        <div class="stat-lbl">Sites actifs</div>
       </div>
+      <div class="stat-trend green">↑ +1</div>
     </div>
 
-    <div class="metrics-row">
-      <div class="metric-dark">
-        <div class="metric-icon green">◈</div>
-        <div class="metric-data">
-          <div class="metric-val">{{ sites.length }}</div>
-          <div class="metric-lbl">Sites actifs</div>
-        </div>
-        <div class="metric-trend green">↑ +1</div>
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+          <path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/>
+        </svg>
       </div>
-      <div class="metric-dark">
-        <div class="metric-icon blue">⬡</div>
-        <div class="metric-data">
-          <div class="metric-val">{{ sites.length * 3 }}</div>
-          <div class="metric-lbl">Capteurs</div>
-        </div>
-        <div class="metric-trend blue">Online</div>
+      <div class="stat-data">
+        <div class="stat-val">{{ sitesData().sensors }}</div>
+        <div class="stat-lbl">Capteurs</div>
       </div>
-      <div class="metric-dark">
-        <div class="metric-icon yellow">⚡</div>
-        <div class="metric-data">
-          <div class="metric-val">284 <span class="metric-unit">kWh</span></div>
-          <div class="metric-lbl">Conso. aujourd'hui</div>
-        </div>
-        <div class="metric-trend green">↓ -8%</div>
+      <div class="stat-trend blue">Online</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+          <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>
+        </svg>
       </div>
-      <div class="metric-dark" [class.metric-alert]="alerts.length > 0">
-        <div class="metric-icon" [class.red]="alerts.length > 0" [class.green]="alerts.length === 0">◉</div>
-        <div class="metric-data">
-          <div class="metric-val" [class.text-red]="alerts.length > 0">{{ alerts.length }}</div>
-          <div class="metric-lbl">Alertes actives</div>
-        </div>
-        <div class="metric-trend" [class.red]="alerts.length > 0" [class.green]="alerts.length === 0">
-          {{ alerts.length === 0 ? '✓ OK' : '⚠ Critique' }}
-        </div>
+      <div class="stat-data">
+        <div class="stat-val">{{ totalPower() }} <small>kWh</small></div>
+        <div class="stat-lbl">Conso. aujourd'hui</div>
+      </div>
+      <div class="stat-trend green">↓ −8%</div>
+    </div>
+
+    <div class="stat-card" [class.stat-alert]="alertsData().length > 0">
+      <div class="stat-icon" [class.red]="alertsData().length > 0" [class.green]="alertsData().length === 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+        </svg>
+      </div>
+      <div class="stat-data">
+        <div class="stat-val" [class.crit]="alertsData().length > 0">{{ alertsData().length }}</div>
+        <div class="stat-lbl">Alertes actives</div>
+      </div>
+      <div class="stat-trend" [class.red]="alertsData().length > 0" [class.green]="alertsData().length === 0">
+        {{ alertsData().length === 0 ? '✓ OK' : '⚠ Critique' }}
       </div>
     </div>
 
-    <div class="panels-row">
-      <div class="panel-dark panel-lg">
-        <div class="panel-header">
-          <span class="panel-title">Consommation énergétique — 24h</span>
-          <span class="panel-badge">kWh</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas #consumptionChart></canvas>
-        </div>
-      </div>
+  </div>
 
-      <div class="panel-dark panel-sm">
-        <div class="panel-header">
-          <span class="panel-title">Charge par site</span>
-        </div>
-        <div class="gauge-list">
-          <div class="gauge-item" *ngFor="let site of sites; let i = index">
-            <div class="gauge-label">{{ site.name }}</div>
-            <div class="gauge-bar-dark">
-              <div class="gauge-fill-dark" [style.width.%]="[82,67,91,34][i % 4]"
-                   [class.gauge-warn]="[82,67,91,34][i % 4] > 85"></div>
+  <!-- ── Panels row : graphe + jauges ───────────────────────── -->
+  <div class="panels-row">
+
+    <!-- Graphe consommation 24h -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Consommation énergétique — 24h</span>
+        <span class="panel-badge">kWh</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas #consumptionChart></canvas>
+      </div>
+    </div>
+
+    <!-- Jauges charge par site -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Charge par site</span>
+      </div>
+      <div class="gauge-list">
+        @for (site of sitesData().list; track site.id; let i = $index) {
+          <div class="gauge-item">
+            <span class="gauge-dot" [class.online]="site.status==='online'"
+                                    [class.warning]="site.status==='warning'"
+                                    [class.offline]="site.status==='offline'"></span>
+            <span class="gauge-label">{{ site.name }}</span>
+            <div class="gauge-bar">
+              <div class="gauge-fill"
+                   [style.width.%]="site.load"
+                   [class.warn]="site.load >= 70 && site.load < 85"
+                   [class.crit]="site.load >= 85"></div>
             </div>
-            <div class="gauge-val">{{ [82,67,91,34][i % 4] }}%</div>
+            <span class="gauge-val" [class.warn]="site.load >= 70" [class.crit]="site.load >= 85">
+              {{ site.load }}%
+            </span>
           </div>
-          <div class="empty-gauge" *ngIf="sites.length === 0">Aucun site</div>
-        </div>
+        } @empty {
+          <div class="gauge-empty">Aucun site enregistré</div>
+        }
       </div>
     </div>
 
-    <div class="panel-dark">
-      <div class="panel-header">
-        <span class="panel-title">Sites — État du parc</span>
-        <a routerLink="/sites" class="panel-link">Voir tout →</a>
-      </div>
-      <div class="dark-table">
-        <div class="dark-table-head">
-          <span>Nom</span><span>Localisation</span><span>Capteurs</span><span>CPU%</span><span>Mémoire</span><span>Statut</span>
-        </div>
-        <div class="dark-table-row" *ngFor="let site of sites; let i = index">
-          <span class="site-name-dark">{{ site.name }}</span>
-          <span class="text-muted">{{ site.location }}</span>
-          <span>{{ (i+1) * 3 }}</span>
-          <span>
-            <div class="inline-bar"><div class="inline-fill" [style.width.%]="[45,62,88,23][i%4]"
-              [class.bar-warn]="[45,62,88,23][i%4] > 80"></div></div>
-            {{ [45,62,88,23][i%4] }}%
-          </span>
-          <span>{{ [370,512,256,128][i%4] }} MiB</span>
-          <span><span class="status-dark ok">● En ligne</span></span>
-        </div>
-        <div class="empty-dark" *ngIf="sites.length === 0 && !loading">Aucun site enregistré</div>
-        <div class="empty-dark" *ngIf="loading">Chargement...</div>
-      </div>
+  </div>
+
+  <!-- ── Tableau sites ──────────────────────────────────────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Sites — État du parc</span>
+      <a routerLink="/sites" class="panel-link">Voir tout →</a>
     </div>
-  </main>
+    <div class="table-wrap">
+      <div class="tbl-head">
+        <span>Nom</span>
+        <span>Localisation</span>
+        <span>Capteurs</span>
+        <span>Charge</span>
+        <span>Conso.</span>
+        <span>Statut</span>
+      </div>
+      @for (site of sitesData().list; track site.id) {
+        <div class="tbl-row">
+          <span class="tbl-name">{{ site.name }}</span>
+          <span class="tbl-muted">{{ site.location }}</span>
+          <span class="tbl-mono">{{ site.sensors }}</span>
+          <span>
+            <div class="inline-bar">
+              <div class="inline-fill"
+                   [style.width.%]="site.load"
+                   [class.warn]="site.load >= 70 && site.load < 85"
+                   [class.crit]="site.load >= 85"></div>
+            </div>
+            <span class="tbl-mono" [class.warn]="site.load >= 70" [class.crit]="site.load >= 85">
+              {{ site.load }}%
+            </span>
+          </span>
+          <span class="tbl-mono">{{ site.power }} kWh</span>
+          <span>
+            <span class="status-badge" [class]="'status-badge ' + site.status">
+              {{ site.status === 'online' ? 'En ligne' : site.status === 'warning' ? 'Alerte' : 'Hors ligne' }}
+            </span>
+          </span>
+        </div>
+      } @empty {
+        <div class="tbl-empty">
+          @if (loading) { Chargement... } @else { Aucun site enregistré }
+        </div>
+      }
+    </div>
+  </div>
+
 </div>

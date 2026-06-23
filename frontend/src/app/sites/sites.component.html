@@ -1,0 +1,203 @@
+<div class="page">
+
+  <!-- ── En-tête ──────────────────────────────────────────── -->
+  <header class="head">
+    <div>
+      <h1 class="title">Sites</h1>
+      <p class="sub">{{ counts().all }} sites surveillés · {{ counts().online }} en ligne</p>
+    </div>
+    <button type="button" class="btn-add">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Ajouter un site
+    </button>
+  </header>
+
+  <!-- ── Stats row globale ─────────────────────────────────── -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="sc-label">Total sites</div>
+      <div class="sc-val">{{ counts().all }}</div>
+      <div class="sc-sub">EnergySense monitored</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-label">En ligne</div>
+      <div class="sc-val accent">{{ counts().online }}</div>
+      <div class="sc-sub">{{ onlinePercent() }}% disponibilité</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-label">Conso. totale</div>
+      <div class="sc-val">{{ totalPower() }}<small style="font-size:11px;color:var(--text3);margin-left:3px">kWh</small></div>
+      <div class="sc-sub">Toutes installations</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-label">Alertes actives</div>
+      <div class="sc-val" [class.crit]="counts().totalAlerts > 0" [class.accent]="counts().totalAlerts === 0">
+        {{ counts().totalAlerts }}
+      </div>
+      <div class="sc-sub">{{ counts().criticalAlerts }} critiques</div>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ───────────────────────────────────────────── -->
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input type="text" placeholder="Rechercher un site ou une localisation…"
+             (input)="search.set($any($event.target).value)">
+    </div>
+
+    <div class="filters">
+      <button class="pill" [class.on]="filter()==='all'" (click)="filter.set('all')">
+        Tous <span class="badge">{{ counts().all }}</span>
+      </button>
+      <button class="pill" [class.on]="filter()==='online'" (click)="filter.set('online')">
+        <span class="dot online"></span> En ligne <span class="badge">{{ counts().online }}</span>
+      </button>
+      <button class="pill" [class.on]="filter()==='warning'" (click)="filter.set('warning')">
+        <span class="dot warning"></span> Alerte <span class="badge">{{ counts().warning }}</span>
+      </button>
+      <button class="pill" [class.on]="filter()==='offline'" (click)="filter.set('offline')">
+        <span class="dot offline"></span> Hors ligne <span class="badge">{{ counts().offline }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Contenu ───────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="grid">
+      @for (s of [1,2,3,4]; track s) {
+        <div class="card sk">
+          <div class="sk-line w55"></div>
+          <div class="sk-line w35"></div>
+          <div class="sk-block"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="grid">
+      @for (site of filtered(); track site.id) {
+
+        <article class="card"
+                 [attr.data-status]="site.status"
+                 (click)="open(site)">
+
+          <!-- Top : nom + badge statut + chevron -->
+          <div class="card-top">
+            <span class="name">
+              <span class="dot"
+                    [class.online]="site.status==='online'"
+                    [class.warning]="site.status==='warning'"
+                    [class.offline]="site.status==='offline'"
+                    [class.pulse]="site.status==='online'"></span>
+              {{ site.name }}
+            </span>
+            <div class="card-top-right">
+              <span class="status-badge" [class]="'status-badge ' + site.status">
+                {{ statusLabel(site.status) }}
+              </span>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round">
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Localisation -->
+          <div class="loc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ site.location }}
+          </div>
+
+          <!-- Métriques -->
+          <div class="stats">
+            <div class="stat">
+              <span class="val">{{ site.sensors }}</span>
+              <span class="lbl">Capteurs</span>
+            </div>
+            <div class="stat">
+              <span class="val"
+                    [class.ok]="site.alerts===0"
+                    [class.warn]="site.alerts>0 && site.alerts<3"
+                    [class.crit]="site.alerts>=3">{{ site.alerts }}</span>
+              <span class="lbl">Alertes</span>
+            </div>
+            <div class="stat">
+              <span class="val"
+                    [class.warn]="site.temp>25 && site.temp<=30"
+                    [class.crit]="site.temp>30">{{ site.temp }}°</span>
+              <span class="lbl">Temp.</span>
+            </div>
+            <div class="stat">
+              <span class="val">{{ site.power }}<small>kWh</small></span>
+              <span class="lbl">Conso.</span>
+            </div>
+          </div>
+
+          <!-- Sparkline -->
+          <div class="sparkline">
+            <svg viewBox="0 0 200 28" preserveAspectRatio="none">
+              <!-- Aire sous la courbe -->
+              <polyline
+                [attr.points]="(site.sparkline || defaultSparkline(site.status)) + ' 200,28 0,28'"
+                [attr.fill]="sparklineAreaColor(site.status)"
+                stroke="none"/>
+              <!-- Ligne -->
+              <polyline
+                [attr.points]="site.sparkline || defaultSparkline(site.status)"
+                fill="none"
+                [attr.stroke]="sparklineColor(site.status)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.9"/>
+            </svg>
+          </div>
+
+          <!-- Charge -->
+          <div class="load">
+            <div class="load-head">
+              <span>Charge</span>
+              <span [class.warn]="site.load>=70 && site.load<85"
+                    [class.crit]="site.load>=85">{{ site.load }}%</span>
+            </div>
+            <div class="track">
+              <div class="fill"
+                   [style.width.%]="site.load"
+                   [class.warn]="site.load>=70 && site.load<85"
+                   [class.crit]="site.load>=85"></div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          @if (site.tags && site.tags.length > 0) {
+            <div class="tags">
+              @for (tag of site.tags; track tag) {
+                <span class="tag">{{ tag }}</span>
+              }
+            </div>
+          }
+
+        </article>
+
+      } @empty {
+        <div class="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.4" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <p>Aucun site ne correspond</p>
+          <span>Modifie ta recherche ou choisis un autre filtre.</span>
+        </div>
+      }
+    </div>
+  }
+
+</div>

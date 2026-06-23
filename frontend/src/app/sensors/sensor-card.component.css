@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════════════════
+   sensor-card.component.css — EnergySense · Dark premium
+   ═══════════════════════════════════════════════════════ */
+
+:host {
+  --panel:  #181b1f;
+  --border: #2a2d35;
+  --border2:#363b44;
+  --text:   #f0f1f3;
+  --text2:  #969ba3;
+  --text3:  #6e7681;
+  --accent: #1D9E75;
+  --accent2:#2fbf8d;
+  --crit:   #e2504a;
+  --warn:   #e0a64a;
+  --info:   #4a9ee0;
+  --mono:   'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  display: block;
+}
+
+/* ── Card ──────────────────────────────────────────────── */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Border-left selon type — visible en permanence */
+.card[data-type="temp"]     { border-left: 2px solid var(--accent); }
+.card[data-type="humidity"] { border-left: 2px solid var(--info); }
+.card[data-type="power"]    { border-left: 2px solid var(--warn); }
+.card[data-type="pressure"] { border-left: 2px solid #a78bfa; }
+
+/* Seuil dépassé → halo rouge */
+.card.alert {
+  border-color: rgba(226,80,74,.45);
+  box-shadow: 0 0 0 1px rgba(226,80,74,.15), 0 8px 24px -10px rgba(226,80,74,.35);
+}
+
+/* ── Top : identité + badge LIVE ───────────────────────── */
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ident {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Icône colorée selon type */
+.ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ico[data-t="temp"]     { background: rgba(29,158,117,.12);  color: var(--accent2); }
+.ico[data-t="humidity"] { background: rgba(74,158,224,.12);  color: var(--info); }
+.ico[data-t="power"]    { background: rgba(224,166,74,.12);  color: var(--warn); }
+.ico[data-t="pressure"] { background: rgba(167,139,250,.12); color: #a78bfa; }
+.ico svg { width: 18px; height: 18px; }
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--mono);
+  letter-spacing: .02em;
+}
+.type {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+/* Badge LIVE */
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--crit);
+  font-family: var(--mono);
+  border: 1px solid rgba(226,80,74,.25);
+  background: rgba(226,80,74,.08);
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--crit);
+  animation: blink 1.4s infinite;
+  flex-shrink: 0;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
+}
+
+/* ── Lecture principale ────────────────────────────────── */
+.reading {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.card.alert .value { color: var(--crit); }
+
+.unit {
+  font-size: 14px;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+
+.trend {
+  margin-left: auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+.trend.up   { color: var(--accent2); background: rgba(29,158,117,.08);  border-color: rgba(29,158,117,.20); }
+.trend.down { color: var(--info);    background: rgba(74,158,224,.08);  border-color: rgba(74,158,224,.20); }
+.trend.flat { color: var(--text3);   background: rgba(255,255,255,.04); border-color: var(--border); }
+
+/* ── Graphique Chart.js ────────────────────────────────── */
+.chart {
+  height: 88px;
+  position: relative;
+  margin: 4px 0 12px;
+}
+
+/* ── Pied de card ──────────────────────────────────────── */
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-family: var(--mono);
+}
+.status.ok  { color: var(--accent2); }
+.status.bad { color: var(--crit); }
+
+.sdot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.thr {
+  font-size: 10.5px;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip { animation: none; }
+}
